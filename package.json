@@ -4,8 +4,8 @@
   "description": "The Best FullStack ",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "win": "node JS/index.js",
-    "dev": "nodemon --exec babel-node JS/index.js"
+    "win": "node src/server.js",
+    "dev": "nodemon --exec babel-node src/server.js"
   },
   "repository": {
     "type": "git",
