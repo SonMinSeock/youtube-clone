@@ -1,0 +1,22 @@
+{
+  "name": "nomard-study",
+  "version": "1.0.0",
+  "description": "fullstack study",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "win": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SonMinSeock/youtube-clone.git"
+  },
+  "author": "SonMinSeock",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SonMinSeock/youtube-clone/issues"
+  },
+  "homepage": "https://github.com/SonMinSeock/youtube-clone#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
