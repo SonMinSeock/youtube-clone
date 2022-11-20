@@ -1,5 +1,4 @@
-# Youtube Clone
-# Route Design! 💜
+# Youtube Clone, Route Design! 💜
 
 / -> Home
 /join -> Join
