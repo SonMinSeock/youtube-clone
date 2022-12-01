@@ -15,9 +15,10 @@ app.set("views", process.cwd() + "/src/views");
 
 const logger = morgan("dev");
 app.use(logger);
+// form의 데이터를 이해 힐수있도록 도와준다.
+app.use(express.urlencoded({extended: true}));
 
 // Routers
-
 app.use("/", globalRouter);
 app.use("/users", userRouter);
 app.use("/videos", videoRouter);
