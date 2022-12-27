@@ -1,55 +1,67 @@
-const videos = [
-  {
-    title: "First Video",
-    rating: 4.5,
-    comment: 2,
-    createdAt: "2 minutes ago",
-    views: 1,
-    id: 1,
-  },
-  {
-    title: "Second Video",
-    rating: 4.5,
-    comment: 2,
-    createdAt: "2 minutes ago",
-    views: 50,
-    id: 2
-  },
-  {
-    title: "Third Video",
-    rating: 4.5,
-    comment: 2,
-    createdAt: "2 minutes ago",
-    views: 50,
-    id: 3
-  },
-];
+import e from "express";
+import Video from "../models/Video";
 
-export const trending = (req, res) => {  
+/* Video.find({}, (error, videos) => {
+  if (error) {
+    return res.render("server-error");
+  }
+  return res.render("home", { pageTitle: "Home", videos: [] });
+});
+*/
+
+export const home = async (req, res) => {
+  const videos = await Video.find({});
+  console.log(videos);
   return res.render("home", { pageTitle: "Home", videos });
 };
 
-export const watch = (req, res) => {
+export const watch = async (req, res) => {
   const { id } = req.params;
-  const video = videos[id - 1];
-  console.log("Show Video ", id);
-  res.render("watch", { pageTitle: `Watching: ${video.title}`,  video});
-}
+  const video = await Video.findById(id);
+  console.log(video);
+  if (!video) {
+    return res.render("404", { pageTitle: "Video not found." });
+  }
+  return res.render("watch", { pageTitle: video.title, video });
+};
 
-export const getEdit = (req, res) => {
+export const getEdit = async (req, res) => {
   const { id } = req.params;
-  const video = videos[id - 1];
+  const video = await Video.findById(id);
 
-  res.render("edit", { pageTitle: `Editing: ${video.title}`, video});
-}
+  if (!video) {
+    return res.render("404", { pageTitle: "Video not found." });
+  }
+
+  res.render("edit", { pageTitle: `Edit ${video.title}`, video });
+};
 
 export const postEdit = (req, res) => {
   const { id } = req.params;
   const { title } = req.body;
-  
-  videos[id - 1].title = title; 
-
   return res.redirect(`/videos/${id}`);
-}
+};
 
 export const logout = (req, res) => res.send("Log Out");
+
+export const getUpload = (req, res) => {
+  return res.render("upload", { pageTitle: "Upload Video" });
+};
+
+export const postUpload = async (req, res) => {
+  // here we will add a video to the videos array.
+  try {
+    const { title, description, hashtags } = req.body;
+    await Video.create({
+      title: title,
+      description: description,
+      hashtags: hashtags.split(",").map((word) => `#${word}`),
+    });
+    return res.redirect("/");
+  } catch (error) {
+    return res.render("upload", {
+      pageTitle: "Upload Video",
+      errorMessage: error._message,
+    });
+  }
+};
