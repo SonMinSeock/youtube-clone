@@ -12,6 +12,13 @@ const videoSchema = mongoose.Schema({
   },
 });
 
+// static 생성
+videoSchema.static("formatHashtags", function (hashtags) {
+  return hashtags
+    .split(",")
+    .map((word) => (word.startsWith("#") ? word : `#${word}`));
+});
+
 // model 생성
 const Video = mongoose.model("Video", videoSchema);
 export default Video;
