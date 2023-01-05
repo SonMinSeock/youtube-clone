@@ -9,7 +9,7 @@ import Video, { formatHashtags } from "../models/Video";
 */
 
 export const home = async (req, res) => {
-  const videos = await Video.find({});
+  const videos = await Video.find({}).sort({ createdAt: "desc" });
   console.log(videos);
   return res.render("home", { pageTitle: "Home", videos });
 };
@@ -75,4 +75,28 @@ export const postUpload = async (req, res) => {
       errorMessage: error._message,
     });
   }
+};
+
+export const deleteVideo = async (req, res) => {
+  const { id } = req.params;
+  await Video.findByIdAndDelete(id);
+
+  // delete video
+  return res.redirect("/");
+};
+
+export const search = async (req, res) => {
+  const { keyword } = req.query;
+
+  let videos = [];
+  if (keyword) {
+    // search...
+    videos = await Video.find({
+      title: {
+        $regex: new RegExp(keyword, "i"),
+      },
+    });
+  }
+  console.log(videos);
+  return res.render("Search", { pageTitle: "Search", videos });
 };
