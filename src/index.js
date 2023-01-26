@@ -3,7 +3,9 @@ import morgan from "morgan";
 import rootRouter from "./routers/rootRouter";
 import videoRouter from "./routers/videoRouter";
 import userRouter from "./routers/userRouter";
-
+import session from "express-session";
+import { localMiddleware } from "./middlewares";
+import MongoStore from "connect-mongo";
 // application settings ...
 const app = express();
 // view engine pug setting.
@@ -14,6 +16,19 @@ const logger = morgan("dev");
 app.use(logger);
 // form의 데이터를 이해 힐수있도록 도와준다.
 app.use(express.urlencoded({ extended: true }));
+
+// 세션미들웨어
+app.use(
+  session({
+    secret: process.env.COOKIE_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: process.env.DB_URL }),
+  })
+);
+
+// 로컬 미들웨어
+app.use(localMiddleware);
 
 // Routers
 app.use("/", rootRouter);
