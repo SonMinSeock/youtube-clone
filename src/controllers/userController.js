@@ -1,6 +1,7 @@
 import User from "../models/User";
 import bcrypt from "bcrypt";
 import fetch from "node-fetch";
+import { raw } from "express";
 
 export const getJoin = (req, res) => res.render("join", { pageTitle: "Join" });
 export const postJoin = async (req, res) => {
@@ -156,8 +157,37 @@ export const getEdit = (req, res) => {
   return res.render("edit-profile", { pageTitle: "Edit Profile" });
 };
 
-export const postEdit = (req, res) => {
-  return res.render("edit-profile");
+export const postEdit = async (req, res) => {
+  const {
+    session: {
+      user: { _id },
+    },
+  } = req;
+
+  const { name, email, username, location } = req.body;
+
+  const findUsername = await User.findOne({ username });
+  const findEmail = await User.findOne({ email });
+
+  if (findUsername._id != _id || findEmail._id != _id) {
+    console.log("username 혹은 email을 사용하고 있습니다.");
+    return res.redirect("/users/edit");
+  }
+
+  const updateUser = await User.findByIdAndUpdate(
+    _id,
+    {
+      name,
+      email,
+      username,
+      location,
+    },
+    { new: true }
+  );
+
+  console.log("updateUser : ", updateUser);
+  req.session.user = updateUser;
+  return res.redirect("/users/edit");
 };
 
 export const see = (req, res) => res.send("See User");
