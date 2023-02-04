@@ -1,7 +1,7 @@
 import User from "../models/User";
 import bcrypt from "bcrypt";
 import fetch from "node-fetch";
-import { raw } from "express";
+import e, { raw } from "express";
 
 export const getJoin = (req, res) => res.render("join", { pageTitle: "Join" });
 export const postJoin = async (req, res) => {
@@ -129,9 +129,10 @@ export const finishGithubLogin = async (req, res) => {
     }
     // !!!! primary이면서 verified인 email이 있다는 뜻이다.
     let user = await User.findOne({ email: emailObj.email });
+
     if (!user) {
       user = await User.create({
-        email: emailData.email,
+        email: emailObj.email,
         password: "",
         socialOnly: true,
         username: userData.login,
@@ -162,9 +163,8 @@ export const postEdit = async (req, res) => {
     session: {
       user: { _id },
     },
+    body: { name, email, username, location },
   } = req;
-
-  const { name, email, username, location } = req.body;
 
   const findUsername = await User.findOne({ username });
   const findEmail = await User.findOne({ email });
@@ -190,5 +190,45 @@ export const postEdit = async (req, res) => {
   return res.redirect("/users/edit");
 };
 
+export const getChangePassword = (req, res) => {
+  if (req.session.user.socialOnly) {
+    return res.redirect("/");
+  }
+  return res.render("users/change-password", { pageTitle: "Change Password" });
+};
+
+export const postChangePassword = async (req, res) => {
+  const {
+    session: {
+      user: { _id },
+    },
+    body: { oldPassword, newPassword, newPasswordConfirmation },
+  } = req;
+
+  // password validaition
+  const user = await User.findById(_id);
+
+  const ok = await bcrypt.compare(oldPassword, user.password);
+  if (!ok) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "Change Password",
+      errorMessage: "The current password is incorrect",
+    });
+  }
+  if (newPassword !== newPasswordConfirmation) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "Change Password",
+      errorMessage: "The password does not match the confirmation",
+    });
+  }
+  // upload password
+  user.password = newPassword;
+  // pre sace middleware 동작.
+  await user.save();
+
+  // send nontification
+  return res.redirect("/users/logout");
+};
+
 export const see = (req, res) => res.send("See User");
-// github
+// githubs
