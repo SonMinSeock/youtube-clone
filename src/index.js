@@ -30,6 +30,8 @@ app.use(
 // 로컬 미들웨어
 app.use(localMiddleware);
 
+// Static files serving
+app.use("/uploads", express.static("uploads"));
 // Routers
 app.use("/", rootRouter);
 app.use("/users", userRouter);
