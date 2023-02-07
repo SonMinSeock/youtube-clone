@@ -11,22 +11,21 @@ import User from "../models/User";
 
 export const home = async (req, res) => {
   const videos = await Video.find({}).sort({ createdAt: "desc" });
-  console.log(videos);
+  console.log("home controller videos object : ", videos);
   return res.render("home", { pageTitle: "Home", videos });
 };
 
 export const watch = async (req, res) => {
   const { id } = req.params;
-  const video = await Video.findById(id);
-  const owner = await User.findById(video.owner);
 
-  console.log("owner : ", owner);
+  const video = await Video.findById(id).populate("owner");
 
-  console.log("watch video obj : ", video);
+  console.log("populate after video obj : ", video);
+
   if (!video) {
     return res.status(404).render("404", { pageTitle: "Video not found." });
   }
-  return res.render("watch", { pageTitle: video.title, video, owner });
+  return res.render("watch", { pageTitle: video.title, video });
 };
 
 export const getEdit = async (req, res) => {
