@@ -1,4 +1,5 @@
 import Video, { formatHashtags } from "../models/Video";
+import User from "../models/User";
 
 /* Video.find({}, (error, videos) => {
   if (error) {
@@ -17,11 +18,15 @@ export const home = async (req, res) => {
 export const watch = async (req, res) => {
   const { id } = req.params;
   const video = await Video.findById(id);
-  console.log(video);
+  const owner = await User.findById(video.owner);
+
+  console.log("owner : ", owner);
+
+  console.log("watch video obj : ", video);
   if (!video) {
     return res.status(404).render("404", { pageTitle: "Video not found." });
   }
-  return res.render("watch", { pageTitle: video.title, video });
+  return res.render("watch", { pageTitle: video.title, video, owner });
 };
 
 export const getEdit = async (req, res) => {
@@ -61,12 +66,34 @@ export const getUpload = (req, res) => {
 
 export const postUpload = async (req, res) => {
   // here we will add a video to the videos array.
+  const {
+    user: { _id },
+  } = req.session;
+  const { path: fileUrl } = req.file;
+  const { title, description, hashtags } = req.body;
+  /*
+  const {  
+    session: {
+      user: {
+        _id
+      }
+    },
+    file: {
+      path: fileUrl
+    },
+    body: {
+      title, description, hashtags
+    }
+  } = req;
+  */
+
   try {
-    const { title, description, hashtags } = req.body;
     await Video.create({
       title: title,
       description: description,
       hashtags: Video.formatHashtags(hashtags),
+      fileUrl,
+      owner: _id,
     });
     return res.redirect("/");
   } catch (error) {
