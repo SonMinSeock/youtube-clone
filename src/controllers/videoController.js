@@ -10,7 +10,9 @@ import User from "../models/User";
 */
 
 export const home = async (req, res) => {
-  const videos = await Video.find({}).sort({ createdAt: "desc" });
+  const videos = await Video.find({})
+    .sort({ createdAt: "desc" })
+    .populate("owner");
   console.log("home controller videos object : ", videos);
   return res.render("home", { pageTitle: "Home", videos });
 };
@@ -156,7 +158,7 @@ export const search = async (req, res) => {
       title: {
         $regex: new RegExp(keyword, "i"),
       },
-    });
+    }).populate("owner");
     console.log(
       " videoController에있는 search 컨트롤러 videos 참조 : ",
       videos
