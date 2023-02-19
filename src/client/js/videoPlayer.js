@@ -109,9 +109,9 @@ const handleMouseLeave = () => {
   controlsTimeout = setTimeout(hideControls, 3000);
 };
 
-const handleEnded = async () => {
+const handleEnded = () => {
   const { id } = videoContainer.dataset;
-  await fetch(`/api/videos/${id}/view`, { method: "POST" });
+  fetch(`/api/videos/${id}/view`, { method: "POST" });
 };
 
 playBtn.addEventListener("click", handlePlayClick);
