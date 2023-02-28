@@ -86,7 +86,9 @@ export const postUpload = async (req, res) => {
     user: { _id },
   } = req.session;
 
-  const { path: fileUrl } = req.file;
+  const { video, thumb } = req.files;
+
+  console.log("video, thumb : ", video, thumb);
   const { title, description, hashtags } = req.body;
   /*
   const {  
@@ -109,7 +111,8 @@ export const postUpload = async (req, res) => {
       title: title,
       description: description,
       hashtags: Video.formatHashtags(hashtags),
-      fileUrl,
+      fileUrl: video[0].path,
+      thumbUrl: thumb[0].path,
       owner: _id,
     });
 
