@@ -7,6 +7,8 @@ import session from "express-session";
 import { localMiddleware } from "./middlewares";
 import MongoStore from "connect-mongo";
 import apiRouter from "./routers/apiRouter";
+import flash from "express-flash";
+
 // application settings ...
 const app = express();
 // view engine pug setting.
@@ -27,6 +29,9 @@ app.use(
     store: MongoStore.create({ mongoUrl: process.env.DB_URL }),
   })
 );
+
+// flash
+app.use(flash());
 
 // 로컬 미들웨어
 app.use(localMiddleware);
