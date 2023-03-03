@@ -150,7 +150,8 @@ export const finishGithubLogin = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  req.session.destroy();
+  req.session.user = null;
+  req.session.loggedIn = false;
   req.flash("info", "Bye Bye");
 
   return res.redirect("/");
@@ -239,8 +240,9 @@ export const postChangePassword = async (req, res) => {
 
 export const see = async (req, res) => {
   const { id } = req.params;
-
-  const user = await User.findById(id).populate({
+  console.log(id);
+  console.log("see : ", typeof req.session.user._id);
+  const user = await User.findById(req.session.user._id).populate({
     path: "videos",
     populate: {
       path: "owner",
