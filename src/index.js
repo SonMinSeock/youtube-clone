@@ -20,6 +20,12 @@ app.use(logger);
 // form의 데이터를 이해 힐수있도록 도와준다.
 app.use(express.urlencoded({ extended: true }));
 
+// 서버가 string을 이해 할수있도록 도와준다.
+//app.use(express.text());
+
+// 서버가 JSON을 이해하고 JS Object로 바꿔주도록 도와준다.
+app.use(express.json());
+
 // 세션미들웨어
 app.use(
   session({
