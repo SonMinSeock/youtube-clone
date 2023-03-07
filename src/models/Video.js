@@ -25,4 +25,5 @@ videoSchema.static("formatHashtags", function (hashtags) {
 
 // model 생성
 const Video = mongoose.model("Video", videoSchema);
+
 export default Video;
