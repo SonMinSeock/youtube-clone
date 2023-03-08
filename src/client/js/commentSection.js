@@ -1,6 +1,31 @@
 const videoContainer = document.getElementById("videoContainer");
 const form = document.getElementById("commentForm");
 
+const addComment = (text, id) => {
+  const videoComments = document.querySelector(".video__comments ul");
+  const newComment = document.createElement("li");
+
+  newComment.dataset.id = id;
+
+  const icon = document.createElement("i");
+  const span = document.createElement("span");
+  const deleteIcon = document.createElement("span");
+
+  newComment.className = "video__comment";
+  icon.className = "fas fa-comment";
+
+  newComment.appendChild(icon);
+
+  span.innerText = ` ${text}`;
+  deleteIcon.innerText = "❌";
+
+  newComment.appendChild(span);
+
+  newComment.appendChild(deleteIcon);
+
+  videoComments.prepend(newComment);
+};
+
 const handleSubmit = async (event) => {
   event.preventDefault();
   const textarea = form.querySelector("textarea");
@@ -10,7 +35,7 @@ const handleSubmit = async (event) => {
   if (text === "") {
     return;
   }
-  await fetch(`/api/videos/${videoId}/comment`, {
+  const response = await fetch(`/api/videos/${videoId}/comment`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -18,9 +43,11 @@ const handleSubmit = async (event) => {
     body: JSON.stringify({ text }),
   });
 
-  textarea.value = "";
-
-  window.location.reload(); // 새로고침 해준다.
+  if (response.status === 201) {
+    textarea.value = "";
+    const { newCommentId } = await response.json();
+    addComment(text, newCommentId);
+  }
 };
 
 if (form) {
