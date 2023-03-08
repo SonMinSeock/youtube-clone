@@ -72,7 +72,7 @@ const handleDelete = async (event) => {
     body: JSON.stringify({ commentId: id }),
   });
 
-  if (response.status === 200) {
+  if (response.status === 201) {
     deleteComment.remove();
   }
 };

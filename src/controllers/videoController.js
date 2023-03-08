@@ -224,10 +224,11 @@ export const deleteComment = async (req, res) => {
     return res.sendStatus(404);
   }
 
-  video.comments = video.comments.filter((id) => id !== commentId);
+  video.comments = video.comments.filter((id) => String(id) !== commentId);
+  console.log(video.comments);
   video.save();
 
   await Comment.findByIdAndDelete(commentId);
 
-  return res.sendStatus(200);
+  return res.sendStatus(201);
 };
