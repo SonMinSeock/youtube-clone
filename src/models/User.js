@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 // model 형태 정의
 const userSchema = mongoose.Schema({
