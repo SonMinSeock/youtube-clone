@@ -111,7 +111,7 @@ export const finishGithubLogin = async (req, res) => {
         },
       })
     ).json();
-    console.log(userData);
+
     const emailData = await (
       await fetch(`${apiUrl}/user/emails`, {
         headers: {
@@ -119,7 +119,7 @@ export const finishGithubLogin = async (req, res) => {
         },
       })
     ).json();
-    console.log(emailData);
+
     const emailObj = emailData.find(
       (email) => email.primary === true && email.verified === true
     );
@@ -141,6 +141,85 @@ export const finishGithubLogin = async (req, res) => {
         avatarUrl: userData.avatar_url,
       });
     }
+    req.session.loggedIn = true;
+    req.session.user = user;
+    return res.redirect("/");
+  } else {
+    return res.redirect("/login");
+  }
+};
+
+// kakao login
+export const startKakaoLogin = (req, res) => {
+  const baseUrl = "https://kauth.kakao.com/oauth/authorize";
+  const config = {
+    client_id: "6b6c7b0bc06af6815119ea637762e914",
+    redirect_uri: "http://localhost:4000/users/kakao/finish",
+  };
+
+  const params = new URLSearchParams(config).toString();
+
+  const finalUrl = `${baseUrl}?response_type=code&${params}`;
+
+  return res.redirect(finalUrl);
+};
+
+export const finishKakoLogin = async (req, res) => {
+  const { code } = req.query;
+
+  const config = {
+    client_id: "6b6c7b0bc06af6815119ea637762e914",
+    redirect_uri: "http://localhost:4000/users/kakao/finish",
+    code,
+    grant_type: "authorization_code",
+  };
+
+  const baseUrl = "https://kauth.kakao.com/oauth/token";
+
+  const params = new URLSearchParams(config).toString();
+
+  const finalUrl = `${baseUrl}?${params}&scope=account_email profile_nickname profile_image`;
+
+  const data = await fetch(finalUrl, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  const json = await data.json();
+
+  if ("access_token" in json) {
+    const { access_token } = json;
+
+    const apiUrl = "https://kapi.kakao.com";
+
+    const userData = await (
+      await fetch(`${apiUrl}/v2/user/me`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      })
+    ).json();
+
+    if (!userData) {
+      return res.redirect("/login");
+    }
+
+    let user = await User.findOne({ email: userData.kakao_account.email });
+
+    if (!user) {
+      user = await User.create({
+        email: userData.kakao_account.email,
+        password: "",
+        username: userData.kakao_account.profile.nickname,
+        name: userData.kakao_account.profile.nickname,
+        location: "",
+        socialOnly: true,
+        avatarUrl: userData.kakao_account.profile.profile_image_url,
+      });
+    }
+
     req.session.loggedIn = true;
     req.session.user = user;
     return res.redirect("/");
