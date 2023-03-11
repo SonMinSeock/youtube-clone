@@ -232,3 +232,18 @@ export const deleteComment = async (req, res) => {
 
   return res.sendStatus(201);
 };
+
+export const settingModal = async (req, res) => {
+  const {
+    session: { user },
+    params: { id },
+  } = req;
+
+  const video = await Video.findById(id);
+  console.log("settingModal video : ", video);
+  if (!video) {
+    return res.sendStatus(404);
+  }
+
+  return res.status(200).json({ video: video });
+};

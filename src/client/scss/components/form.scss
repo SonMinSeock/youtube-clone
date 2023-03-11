@@ -1,3 +1,10 @@
+.form__container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 form {
     max-width: 420px;
     margin: 0 auto;
